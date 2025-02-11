@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.john.personal.urlshortify.dto.response.UrlStatsResponse;
 import org.john.personal.urlshortify.models.Url;
 import org.john.personal.urlshortify.models.User;
-import org.john.personal.urlshortify.exception.ShortURLNotFound;
+import org.john.personal.urlshortify.exception.UrlNotFoundException;
 import org.john.personal.urlshortify.repositories.UrlRepository;
 import org.springframework.stereotype.Service;
 
@@ -59,12 +59,12 @@ public class UrlShortenerService {
     public String expand(String shortCode){
         Optional<Url> optional = urlRepository.findByShortUrl(shortCode);
         return optional.map(Url::getLongUrl)
-                .orElseThrow(() -> new ShortURLNotFound("this url is invalid"));
+                .orElseThrow(() -> new UrlNotFoundException("this url is invalid"));
     }
 
     public Url getUrlFromShortCode(String shortCode) {
         Optional<Url> optional = urlRepository.findByShortUrl(shortCode);
-        return optional.orElseThrow(() -> new ShortURLNotFound("this url is invalid"));
+        return optional.orElseThrow(() -> new UrlNotFoundException("this url is invalid"));
     }
 
     private String toBase62(long num) {
@@ -93,7 +93,7 @@ public class UrlShortenerService {
         // owner of url
         User owner = url.getUser();
         if (!owner.getId().equals(signedInUser.getId())) {
-            throw new ShortURLNotFound("this url is invalid or you do not have access to it");
+            throw new UrlNotFoundException("this url is invalid or you do not have access to it");
         }
         return UrlStatsResponse.builder()
                 .longUrl(url.getLongUrl())
