@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
+import org.john.personal.urlshortify.exception.InvalidJWTTokenException;
 import org.john.personal.urlshortify.models.User;
 import org.john.personal.urlshortify.repositories.UserRepository;
 import org.john.personal.urlshortify.utils.JwtUtil;
@@ -52,6 +53,6 @@ public class AuthInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or missing token");
+        throw new InvalidJWTTokenException("Invalid or missing token");
     }
 }

@@ -14,4 +14,5 @@ public interface UrlRepository extends JpaRepository<Url, Long> {
     Optional<Url> findByLongUrl(String longUrl);
     long count();
     List<Url> findByUserOrderByCreatedAtDesc(User user);
+    void deleteByShortUrl(String shortUrl);
 }

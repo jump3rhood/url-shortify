@@ -2,6 +2,7 @@ package org.john.personal.urlshortify.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.john.personal.urlshortify.interceptor.AuthInterceptor;
+import org.john.personal.urlshortify.interceptor.RoleInterceptor;
 import org.john.personal.urlshortify.security.resolver.CurrentUserResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private CurrentUserResolver currentUserResolver;
 
+    @Autowired
+    private RoleInterceptor roleInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("Registering Auth Interceptor");
@@ -25,6 +29,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/auth/**", "/");
         log.info("Auth Interceptor registered");
+
+        log.info("Registering Role Interceptor");
+        registry.addInterceptor(roleInterceptor)
+                .addPathPatterns("/api/admin/**");
+        log.info("Role Interceptor registered");
     }
 
     @Override

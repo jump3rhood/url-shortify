@@ -10,14 +10,15 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.john.personal.urlshortify.models.Role;
 import org.john.personal.urlshortify.models.User;
 import org.john.personal.urlshortify.repositories.TokenBlackListRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -37,14 +38,19 @@ public class JwtUtil {
 
     // Create a jwt token with claims - user-id and email
     public String generateToken(User user){
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("roles", user.getRoles().stream().map(Role::getValue).collect(Collectors.toList()));
         return Jwts.builder()
                 .subject(user.getEmail())
-                .claim("userId", user.getId().toString())
+                .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 12 * 60 * 60 * 1000))// 12 hours
                 .signWith(key, Jwts.SIG.HS512)
                 .compact();
     }
+
+
 
     private boolean isTokenBlacklisted(String token) {
         try {
@@ -56,6 +62,15 @@ public class JwtUtil {
         }
     }
 
+    public boolean hasRole(String token, Role role) {
+        Optional<Claims> optionalClaims = validateTokenAndGetClaims(token);
+        if (optionalClaims.isEmpty()) {
+            return false;
+        }
+        Claims claims = optionalClaims.get();
+        List roles = claims.get("roles", List.class);
+        return roles.contains(role.getValue());
+    }
 
     public Optional<Claims> validateTokenAndGetClaims(String token) {
         if (isTokenBlacklisted(token)) {

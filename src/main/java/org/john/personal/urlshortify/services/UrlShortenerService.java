@@ -101,4 +101,8 @@ public class UrlShortenerService {
                 .clickCount(url.getClicks().size())
                 .build();
     }
+
+    public void deleteUrl(String shortCode) {
+        urlRepository.deleteByShortUrl(shortCode);
+    }
 }

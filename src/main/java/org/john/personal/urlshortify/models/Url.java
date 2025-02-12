@@ -1,5 +1,6 @@
 package org.john.personal.urlshortify.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -32,6 +33,7 @@ public class Url {
     @OneToMany(mappedBy = "url")
     private List<Click> clicks;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
